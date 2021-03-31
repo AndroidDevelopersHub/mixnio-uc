@@ -39,7 +39,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(express.static("uploads"));
-app.listen(3000);
+app.listen(config.port);
 
 
 

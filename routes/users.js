@@ -19,12 +19,13 @@ router.get('/users', function(req ,res){
 
 
 
-//First Step To generate AccessToken & RefreshToken
+//First Step - - Login To get AccessToken & RefreshToken
 router.post('/signup', (req,res) => {
     const postData = req.body;
     const user = {
         email: postData.email,
         name: postData.name,
+        token: postData.token,
     };
 
     // do the database authentication here, with user name and password combination.
@@ -53,7 +54,8 @@ router.post('/get_accessToken', (req,res) => {
     if((postData.refreshToken) && (postData.refreshToken in tokenList)) {
         const user = {
             "email": postData.email,
-            "name": postData.name
+            "name": postData.name,
+            "token": postData.token,
         }
         const accessToken = jwt.sign(user, config.secret, { expiresIn: config.tokenLife})
         const response = {
