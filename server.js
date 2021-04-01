@@ -55,7 +55,7 @@ app.use("/", userRoute);
 
 
 app.get('/x', function(req ,res){
-    res.send('ashik '+ today);
+    res.send(' '+ today);
 });
 
 app.get("/secure", tokenChecker.checkToken, (req, res) => {
