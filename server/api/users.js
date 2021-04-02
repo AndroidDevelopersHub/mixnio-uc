@@ -1,26 +1,58 @@
 const express = require("express");
-//const db = require("../database/db");
+const db = require("/database/db");
 const router = express.Router();
-
-
 let jwt = require("jsonwebtoken");
-const config = require("../middleware/config.json"); // refresh
-let tokenChecker = require("../middleware/tockenchecker");
-
-
-// Store all refresh token against user details
+const config = require("../../middleware/config.json"); // refresh
+let tokenChecker = require("../../middleware/tockenchecker");
 const tokenList = {};
+const responsemsg = require('../common/middleware/response-msg')
+const responsecode = require('../common/middleware/response-code')
+const response = require('../common/middleware/api-response')
 
 
-router.get('/users', function(req ,res){
-    res.send('this is from user Route');
-});
+module.exports = function (router) {
+    router.get('/users', list);
+    router.post('/users', add);
+    router.put('/users/:id', update);
+    router.get('/users/:id', details);
+    router.delete('/users/:id', _delete);
+    router.post('/users-add', signup)
+}
 
 
 
+function add(req, res){
+    return res.send('test');
+}
 
-//First Step - - Login To get AccessToken & RefreshToken
-router.post('/signup', (req,res) => {
+
+
+function list(req ,res ){
+
+    return res.status(200).json({
+        status: responsecode.statusOk,
+        message: responsemsg.userListIsEmpty,
+        items: []
+    });
+
+}
+
+
+function update(req ,res ){
+    return  res.json('single user update');
+}
+
+function details(req ,res ){
+    return  res.json('single user details');
+}
+
+function _delete(req ,res){
+    return  res.json('single user delete');
+}
+
+
+
+function signup(req ,res ){
     const postData = req.body;
     const user = {
         email: postData.email,
@@ -41,8 +73,9 @@ router.post('/signup', (req,res) => {
         refreshToken: refreshToken,
     };
     tokenList[refreshToken] = response;
-    res.status(200).json(response);
-});
+
+    return res.status(200).json(response);
+}
 
 
 //Get New Access Token When Previous AccessToken is not validate any more
@@ -72,7 +105,7 @@ router.post('/get_accessToken', (req,res) => {
 
 
 
-// Get All Users
+//Get All Users
 // router.get("/users", (req, res) => {
 //     db.query("SELECT * FROM user_info", (err, rows, fields) => {
 //         if (!err) {
@@ -90,7 +123,3 @@ router.post('/get_accessToken', (req,res) => {
 //         }
 //     });
 // });
-
-
-
-module.exports = router;

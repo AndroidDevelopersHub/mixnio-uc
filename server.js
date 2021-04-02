@@ -12,14 +12,12 @@ multer = require("multer");
 path = require("path");
 crypto = require("crypto");
 
-
 let jwt = require("jsonwebtoken");
 const config = require("./middleware/config.json"); // refresh
 let tokenChecker = require("./middleware/tockenchecker");
 
 //const db = require("./database/db");
 const today = new Date().toISOString();
-
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,15 +37,19 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(express.static("uploads"));
+app.use(function(req, res,next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization');
+    next();
+});
 app.listen(config.port);
 
 
 
-
-//Define Routes
-const userRoute = require("./routes/users");
-app.use("/", userRoute);
-
+// Router
+const router = require('./server/api/index')
+app.use(router)
 
 
 
