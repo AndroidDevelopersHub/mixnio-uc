@@ -31,11 +31,7 @@ function list(req ,res ){
 
         db.query("SELECT * FROM user_info", (err, rows, fields) => {
         if (!err) {
-            res.send({
-                result: true,
-                msg: "User Details Found",
-                data: rows,
-            });
+          console.log(rows)
         } else {
             res.send({
                 result: false,
@@ -44,7 +40,6 @@ function list(req ,res ){
             });
         }
     });
-
     return res.status(200).json({
         status: responsecode.statusOk,
         message: responsemsg.userListIsEmpty,
