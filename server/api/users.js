@@ -29,7 +29,7 @@ function add(req, res){
 
 function list(req ,res ){
 
-        db.query("SELECT * FROM user_info", (err, result) => {
+        db.query("SELECT * FROM users", (err, result) => {
         if (!err) {
             return res.status(200).json({
                 status: responsecode.statusOk,
