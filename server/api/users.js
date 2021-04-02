@@ -1,5 +1,5 @@
 const express = require("express");
-const db = require("/database/db");
+//const db = require("/database/db");
 const router = express.Router();
 let jwt = require("jsonwebtoken");
 const config = require("../../middleware/config.json"); // refresh

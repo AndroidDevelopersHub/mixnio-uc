@@ -7,7 +7,6 @@ router.get('/', (req,res)=>{
 })
 
 require('./users')(router)
-require('../common/middleware/api-response')(router)
 
 
 module.exports = router;
