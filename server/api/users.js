@@ -33,15 +33,15 @@ function list(req ,res ){
         if (!err) {
             return res.status(200).json({
                 status: responsecode.statusOk,
-                message: responsemsg.userListIsEmpty,
-                items: rows
+                message: responsemsg.userFound,
+                items: fields
             });
 
         } else {
             return res.status(200).json({
                 status: responsecode.statusOk,
                 message: responsemsg.userListIsEmpty,
-                items: err
+                items: fields
             });
 
         }
