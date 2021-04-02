@@ -16,7 +16,7 @@ let jwt = require("jsonwebtoken");
 const config = require("./middleware/config.json"); // refresh
 let tokenChecker = require("./middleware/tockenchecker");
 
-//const db = require("./database/db");
+const db = require('./database/db')
 const today = new Date().toISOString();
 
 app.use(bodyParser.json());
@@ -52,13 +52,6 @@ const router = require('./server/api/index')
 app.use(router)
 
 
-
-
-
-
-app.get('/x', function(req ,res){
-    res.send(' '+ today);
-});
 
 app.get("/secure", tokenChecker.checkToken, (req, res) => {
     res.json({

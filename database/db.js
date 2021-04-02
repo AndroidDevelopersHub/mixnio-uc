@@ -4,8 +4,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "mixcweng_api",
     password: "1982gonzoO",
-    database: "mixcweng_api",
-    timezone: "utc-6",
+    database: "mixcweng_api"
 });
 connection.connect((err) => {
     if (err) throw err;
