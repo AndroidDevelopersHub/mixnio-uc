@@ -31,19 +31,20 @@ function list(req ,res ){
 
         db.query("SELECT * FROM user_info", (err, rows, fields) => {
         if (!err) {
-          console.log(rows)
-        } else {
-            res.send({
-                result: false,
-                msg: "Sorry something went wrong",
-                error: err,
+            return res.status(200).json({
+                status: responsecode.statusOk,
+                message: responsemsg.userListIsEmpty,
+                items: rows
             });
+
+        } else {
+            return res.status(200).json({
+                status: responsecode.statusOk,
+                message: responsemsg.userListIsEmpty,
+                items: err
+            });
+
         }
-    });
-    return res.status(200).json({
-        status: responsecode.statusOk,
-        message: responsemsg.userListIsEmpty,
-        items: []
     });
 
 }
