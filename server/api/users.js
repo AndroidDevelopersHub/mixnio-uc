@@ -29,19 +29,19 @@ function add(req, res){
 
 function list(req ,res ){
 
-        db.query("SELECT * FROM user_info", (err, rows, fields) => {
+        db.query("SELECT * FROM user_info", (err, result) => {
         if (!err) {
             return res.status(200).json({
                 status: responsecode.statusOk,
                 message: responsemsg.userFound,
-                items: fields
+                items: result
             });
 
         } else {
             return res.status(200).json({
                 status: responsecode.statusOk,
                 message: responsemsg.userListIsEmpty,
-                items: fields
+                items: result
             });
 
         }
