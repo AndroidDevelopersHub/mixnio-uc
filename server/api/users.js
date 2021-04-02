@@ -1,5 +1,5 @@
 const express = require("express");
-//const db = require("/database/db");
+const db = require("./db");
 const router = express.Router();
 let jwt = require("jsonwebtoken");
 const config = require("../../middleware/config.json"); // refresh
@@ -28,6 +28,22 @@ function add(req, res){
 
 
 function list(req ,res ){
+
+        db.query("SELECT * FROM user_info", (err, rows, fields) => {
+        if (!err) {
+            res.send({
+                result: true,
+                msg: "User Details Found",
+                data: rows,
+            });
+        } else {
+            res.send({
+                result: false,
+                msg: "Sorry something went wrong",
+                error: err,
+            });
+        }
+    });
 
     return res.status(200).json({
         status: responsecode.statusOk,
