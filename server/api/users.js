@@ -22,7 +22,25 @@ module.exports = function (router) {
 
 
 function add(req, res){
-    return res.send('test');
+
+    db.query("INSERT INTO `users` (`name`, `email`, `phone`, `salt`, `token`) VALUES ("+req.name+","+req.email+" , "+req.phone+",  "+req.salt+", "+req.token+")", (err, result) => {
+        if (!err) {
+            return res.status(200).json({
+                status: responsecode.statusOk,
+                message: responsemsg.userFound,
+                items: result
+            });
+
+        } else {
+            return res.status(200).json({
+                status: responsecode.statusNo,
+                message: responsemsg.userListIsEmpty,
+                items: result
+            });
+
+        }
+    });
+
 }
 
 
@@ -39,7 +57,7 @@ function list(req ,res ){
 
         } else {
             return res.status(200).json({
-                status: responsecode.statusOk,
+                status: responsecode.statusNo,
                 message: responsemsg.userListIsEmpty,
                 items: result
             });
