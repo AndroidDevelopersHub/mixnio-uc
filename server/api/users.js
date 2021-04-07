@@ -30,7 +30,7 @@ function add(req, res){
     var token = req.body.token;
 
     //(`name`, `email`, `phone`, `salt`, `token`)
-    db.query("INSERT INTO users (name) VALUES ('"+name+"')", (err, result) => {
+    db.query("INSERT INTO users (name,email,phone,salt,token) VALUES ("+name,email,phone,salt,token+")", (err, result) => {
         if (!err) {
             return res.status(200).json({
                 status: responsecode.statusOk,
