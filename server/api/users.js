@@ -22,11 +22,11 @@ module.exports = function (router) {
 
 
 const schema = Joi.object({
-    name: Joi.string().required().error(() => ' ').error(() => 'Please select the title'),
-    email: Joi.string().email({tlds: {allow:false}}).error(() => ' ').error(() => 'Invalid email'),
-    phone: Joi.string().required().error(() => ' ').error(() => 'Please select the store name'),
-    salt: Joi.string().required().error(() => ' ').error(() => 'Please select the store id'),
-    token: Joi.string().required().error(() => ' ').error(() => 'Please select the live url')
+    name: Joi.string().min(6).required(),
+    email: Joi.string().email().required().error(() => ' ').error(() => 'Invalid email'),
+    phone: Joi.string().required().error(() => ' ').error(() => 'Please select the phone'),
+    salt: Joi.string().required().error(() => ' ').error(() => 'Please select the password'),
+    token: Joi.string().required().error(() => ' ').error(() => 'Please select token')
 });
 
 
