@@ -11,7 +11,7 @@ const response = require('../common/middleware/api-response')
 const Joi = require('@hapi/joi')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const salt = require('../common/services/commonServices')
+const commonServe = require('../common/services/commonServices')
 
 
 module.exports = function (router) {
@@ -37,7 +37,7 @@ function add(req, res){
     var name = req.body.name;
     var email = req.body.email;
     var phone = req.body.phone;
-    var salt = salt(req.body.salt);
+    var salt = commonServe.salt(req.body.salt);
     var token = req.body.token;
 
     const { error } = schema.validate(req.body);

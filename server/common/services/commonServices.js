@@ -11,6 +11,6 @@ function salt(pass){
 }
 
 
-module.exports = { salt }
+module.exports.salt = salt
 
 
