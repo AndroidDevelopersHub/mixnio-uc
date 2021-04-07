@@ -37,7 +37,7 @@ function add(req, res){
     var name = req.body.name;
     var email = req.body.email;
     var phone = req.body.phone;
-    var salt = commonServe.salt(req.body.salt);
+    var salt = res.body.salt//commonServe.salt(req.body.salt);
     var token = req.body.token;
 
     const { error } = schema.validate(req.body);
