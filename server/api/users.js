@@ -31,7 +31,7 @@ const schema = Joi.object({
     token: Joi.string().required()
 });
 
-
+module.exports.salt = salt;
 function salt(pass){
     bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(pass, salt, function(err, hash) {
