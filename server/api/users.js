@@ -9,6 +9,8 @@ const responsemsg = require('../common/middleware/response-msg')
 const responsecode = require('../common/middleware/response-code')
 const response = require('../common/middleware/api-response')
 const Joi = require('@hapi/joi')
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 
 module.exports = function (router) {
@@ -24,18 +26,26 @@ module.exports = function (router) {
 const schema = Joi.object({
     name: Joi.string().min(6).required(),
     email: Joi.string().email().required(),
-    phone: Joi.string().required(),
+    phone: Joi.string().min(11).required(),
     salt: Joi.string().required(),
     token: Joi.string().required()
 });
 
 
-function add(req, res){
+function salt(pass){
+    bcrypt.genSalt(saltRounds, function(err, salt) {
+        bcrypt.hash(pass, salt, function(err, hash) {
+            // Store hash in your password DB.
+            return hash
+        });
+    });
+}
 
+function add(req, res){
     var name = req.body.name;
     var email = req.body.email;
     var phone = req.body.phone;
-    var salt = req.body.salt;
+    var salt = salt(req.body.salt);
     var token = req.body.token;
 
     const { error } = schema.validate(req.body);
