@@ -8,7 +8,7 @@ const tokenList = {};
 const responsemsg = require('../common/middleware/response-msg')
 const responsecode = require('../common/middleware/response-code')
 const response = require('../common/middleware/api-response')
-const Joi = require('joi')
+const Joi = require('@hapi/joi')
 
 
 module.exports = function (router) {
@@ -23,7 +23,7 @@ module.exports = function (router) {
 
 
 
-function validateLiveData(data) {
+function validation(data) {
 
     const schema = {
         /* _id: Joi.string().allow(null).allow(''),*/
@@ -35,7 +35,7 @@ function validateLiveData(data) {
 
 
     };
-    const result = Joi.validate(data, schema);
+    const result = schema.validate(data)
     return result;
 }
 
@@ -48,7 +48,7 @@ function add(req, res){
     var salt = req.body.salt;
     var token = req.body.token;
 
-    const validation = validateLiveData(req.body);
+    const validation = validation(req.body);
     if (validation.error) return res({message: validation.error.details[0].message});
 
     db.query("INSERT INTO users (name,email,phone,salt,token) VALUES ('"+name+"','"+email+"','"+phone+"','"+salt+"','"+token+"')", (err, result) => {
