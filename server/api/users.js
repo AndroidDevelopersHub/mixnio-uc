@@ -23,7 +23,7 @@ module.exports = function (router) {
 
 function add(req, res){
 
-    db.query("INSERT INTO `users` (`name`, `email`, `phone`, `salt`, `token`) VALUES ("+req.name+","+req.email+" , "+req.phone+",  "+req.salt+", "+req.token+")", (err, result) => {
+    db.query("INSERT INTO `users` (`name`, `email`, `phone`, `salt`, `token`) VALUES (`"+req.name+"`,`"+req.email+"` , `"+req.phone+"`,  `"+req.salt+"`, `"+req.token+"`)", (err, result) => {
         if (!err) {
             return res.status(200).json({
                 status: responsecode.statusOk,
