@@ -8,6 +8,7 @@ const tokenList = {};
 const responsemsg = require('../common/middleware/response-msg')
 const responsecode = require('../common/middleware/response-code')
 const response = require('../common/middleware/api-response')
+const Joi = require('joi')
 
 
 module.exports = function (router) {
@@ -21,6 +22,24 @@ module.exports = function (router) {
 
 
 
+
+function validateLiveData(data) {
+
+    const schema = {
+        /* _id: Joi.string().allow(null).allow(''),*/
+        name: Joi.string().required().error(() => ' ').error(() => 'Please select the title'),
+        email: Joi.string().email({tlds: {allow:false}}).error(() => ' ').error(() => 'Invalid email'),
+        phone: Joi.string().required().error(() => ' ').error(() => 'Please select the store name'),
+        salt: Joi.string().required().error(() => ' ').error(() => 'Please select the store id'),
+        token: Joi.string().required().error(() => ' ').error(() => 'Please select the live url'),
+
+
+    };
+    const result = Joi.validate(data, schema);
+    return result;
+}
+
+
 function add(req, res){
 
     var name = req.body.name;
@@ -29,13 +48,15 @@ function add(req, res){
     var salt = req.body.salt;
     var token = req.body.token;
 
-    //(`name`, `email`, `phone`, `salt`, `token`)
+    const validation = validateLiveData(req.body);
+    if (validation.error) return res({message: validation.error.details[0].message});
+
     db.query("INSERT INTO users (name,email,phone,salt,token) VALUES ('"+name+"','"+email+"','"+phone+"','"+salt+"','"+token+"')", (err, result) => {
         if (!err) {
             return res.status(200).json({
                 status: responsecode.statusOk,
                 message: responsemsg.userSaveSuccess,
-                items: result
+                result: result
             });
 
         } else {
