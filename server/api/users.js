@@ -11,6 +11,7 @@ const response = require('../common/middleware/api-response')
 const Joi = require('@hapi/joi')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const salt = require('../common/services/commonServices')
 
 
 module.exports = function (router) {
@@ -31,15 +32,6 @@ const schema = Joi.object({
     token: Joi.string().required()
 });
 
-module.exports.salt = salt;
-function salt(pass){
-    bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash(pass, salt, function(err, hash) {
-            // Store hash in your password DB.
-            return hash
-        });
-    });
-}
 
 function add(req, res){
     var name = req.body.name;
