@@ -21,23 +21,13 @@ module.exports = function (router) {
 }
 
 
-
-
-function validation(data) {
-
-    const schema = {
-        /* _id: Joi.string().allow(null).allow(''),*/
-        name: Joi.string().required().error(() => ' ').error(() => 'Please select the title'),
-        email: Joi.string().email({tlds: {allow:false}}).error(() => ' ').error(() => 'Invalid email'),
-        phone: Joi.string().required().error(() => ' ').error(() => 'Please select the store name'),
-        salt: Joi.string().required().error(() => ' ').error(() => 'Please select the store id'),
-        token: Joi.string().required().error(() => ' ').error(() => 'Please select the live url'),
-
-
-    };
-    const result = schema.validate(data)
-    return result;
-}
+const schema = Joi.object({
+    name: Joi.string().required().error(() => ' ').error(() => 'Please select the title'),
+    email: Joi.string().email({tlds: {allow:false}}).error(() => ' ').error(() => 'Invalid email'),
+    phone: Joi.string().required().error(() => ' ').error(() => 'Please select the store name'),
+    salt: Joi.string().required().error(() => ' ').error(() => 'Please select the store id'),
+    token: Joi.string().required().error(() => ' ').error(() => 'Please select the live url')
+});
 
 
 function add(req, res){
@@ -48,8 +38,9 @@ function add(req, res){
     var salt = req.body.salt;
     var token = req.body.token;
 
-    const validation = validation(req.body);
-    if (validation.error) return res({message: validation.error.details[0].message});
+    const { error } = schema.validate(req.body);
+
+    if (error) return res.send(error.details[0].message);
 
     db.query("INSERT INTO users (name,email,phone,salt,token) VALUES ('"+name+"','"+email+"','"+phone+"','"+salt+"','"+token+"')", (err, result) => {
         if (!err) {
