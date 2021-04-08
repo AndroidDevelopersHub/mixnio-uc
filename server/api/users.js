@@ -79,7 +79,7 @@ function list(req ,res ){
             return res.status(200).json({
                 status: responsecode.statusNo,
                 message: responsemsg.userListIsEmpty,
-                items: result
+
             });
 
         }
