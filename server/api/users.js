@@ -92,6 +92,7 @@ function update(req ,res ){
 }
 
 function details(req ,res ){
+    const result = bcrypt.compareSync('123', hash);
     return  res.json('single user details');
 }
 

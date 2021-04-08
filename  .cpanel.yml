@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/repositories/minnio-uc-v3
+    - /bin/cp -R * $DEPLOYPATH
