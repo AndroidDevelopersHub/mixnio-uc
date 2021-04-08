@@ -10,7 +10,6 @@ const responsecode = require('../common/middleware/response-code')
 const response = require('../common/middleware/api-response')
 const Joi = require('@hapi/joi')
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
 const commonServe = require('../common/services/commonServices')
 
 
@@ -37,11 +36,10 @@ function add(req, res){
     var name = req.body.name;
     var email = req.body.email;
     var phone = req.body.phone;
-    var salt = res.body.salt//commonServe.salt(req.body.salt);
+    var salt = bcrypt.hashSync(res.body.salt.toString(),  bcrypt.genSaltSync(10));
     var token = req.body.token;
 
     const { error } = schema.validate(req.body);
-
     if (error) return res.send(error.details[0].message);
 
     db.query("INSERT INTO users (name,email,phone,salt,token) VALUES ('"+name+"','"+email+"','"+phone+"','"+salt+"','"+token+"')", (err, result) => {
