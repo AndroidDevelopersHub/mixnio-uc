@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/mixcweng/repositories/minnio-uc-v3
-    - /bin/cp -R * $DEPLOYPATH
+    - /bin/cp -fr * $DEPLOYPATH
