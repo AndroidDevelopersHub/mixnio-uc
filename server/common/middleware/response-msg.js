@@ -10,6 +10,6 @@ module.exports = {
     userNotAvailable: 'User not available.',
     userListIsEmpty: 'No User Found.',
     userFound: 'User Found.',
-    notCustomer: 'You are not registered as customer.'
-
+    notCustomer: 'You are not registered as customer.',
+    userWalletUpdateSuccess: 'User wallet has update successfully.'
 }

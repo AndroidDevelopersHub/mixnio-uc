@@ -20,7 +20,8 @@ module.exports = function (router) {
     router.put('/users/:id', update);
     router.get('/users/:id', details);
     router.delete('/users/:id', _delete);
-    router.post('/users-add', signup)
+    router.post('/users-add', signup);
+    router.patch('/users/wallet/:id' , walletUpdate);
 }
 
 
@@ -29,7 +30,7 @@ const schema = Joi.object({
     email: Joi.string().email().required(),
     phone: Joi.string().min(11).required(),
     salt: Joi.string().required(),
-    token: Joi.string().required()
+    //token: Joi.string().required()
 });
 
 
@@ -42,7 +43,7 @@ function add(req, res){
 
 
     const { error } = schema.validate(req.body);
-    if (error) return res.send(error.details[0].message);
+    if (error) return _response.apiFailed(res ,error.details[0].message)
 
     db.query("SELECT * FROM `users` WHERE email = '"+email+"' OR phone = '"+phone+"'", (err, result) =>{
         if (!result.length){
@@ -64,7 +65,6 @@ function add(req, res){
 
 }
 
-
 function list(req ,res ){
 
         db.query("SELECT * FROM users", (err, result) => {
@@ -77,7 +77,6 @@ function list(req ,res ){
     });
 
 }
-
 
 function update(req ,res ){
     var formData = []
@@ -136,9 +135,82 @@ function details(req ,res ){
 }
 
 function _delete(req ,res){
-    return  res.json('single user delete');
+
+    if (req.params.id){
+        db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
+            if (!result.length){
+                return _response.apiWarning(res, responsemsg.userListIsEmpty)
+            }else {
+                db.query("DELETE FROM `users` WHERE id='" + req.params.id + "'", (err, result) => {
+                    if (!err) {
+                        return _response.apiSuccess(res, responsemsg.userDeleteSuccess)
+                    } else {
+                        return _response.apiFailed(res, err)
+                    }
+                });
+            }
+
+        });
+    }else {
+        return _response.apiWarning(res , 'Please select id')
+    }
 }
 
+function walletUpdate(req , res){
+
+    const schema = Joi.object({
+        wallet: Joi.string().required(),
+        increment: Joi.boolean().required()
+    });
+    const { error } = schema.validate(req.query);
+    if (error) return _response.apiFailed(res ,error.details[0].message)
+
+    var response = []
+
+    if (req.params.id){
+        db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
+
+            if (!err) {
+                response = result[0].wallet
+                console.log(response)
+                if (req.query.increment && req.query.wallet){
+                    if (req.query.increment === 'true'){
+                        var bal = parseFloat(req.query.wallet) + parseFloat(response); // Increment balance
+                        console.log(bal)
+                        db.query("UPDATE users SET wallet ='"+bal+"' WHERE id = '"+req.params.id+"'" , (err , result) =>{
+                            if (!err){
+                                return _response.apiSuccess(res, responsemsg.userWalletUpdateSuccess)
+                            }else{
+                                return _response.apiFailed(res, err)
+                            }
+                        })
+
+                    }else if (req.query.increment === 'false'){
+                        var finalBal = null;
+                        var replaceBal = parseFloat(response) - parseFloat(req.query.wallet) ; // Decrement balance
+                        if (replaceBal > 0){
+                            db.query("UPDATE users SET wallet ='"+replaceBal+"' WHERE id = '"+req.params.id+"'" , (err , result) =>{
+                                if (!err){
+                                    return _response.apiSuccess(res, responsemsg.userWalletUpdateSuccess)
+                                }else{
+                                    return _response.apiFailed(res, err)
+                                }
+                            })
+                        }else {
+                            return _response.apiFailed(res, "This value is big from current balance")
+                        }
+
+                    }
+                }
+
+            } else {
+
+            }
+        });
+    }else {
+        return _response.apiWarning(res , 'Please select id')
+    }
+}
 
 
 function signup(req ,res ){
