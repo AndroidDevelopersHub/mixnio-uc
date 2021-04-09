@@ -49,25 +49,14 @@ function add(req, res){
             console.log('User not exist')
             db.query("INSERT INTO users (name,email,phone,salt) VALUES ('"+name+"','"+email+"','"+phone+"','"+salt+"')", (err, result) => {
                 if (!err) {
-                    return res.status(200).json({
-                        status: responsecode.statusOk,
-                        message: responsemsg.userSaveSuccess,
-                        result: result
-                    });
+                    return _response.apiSuccess(res, responsemsg.userSaveSuccess , result)
                 } else {
-                    return res.status(200).json({
-                        status: responsecode.statusNo,
-                        message: err,
-                        items: result
-                    });
+                    return _response.apiFailed(res, err , result)
                 }
             });
 
         }else {
-            return res.status(200).json({
-                status: responsecode.statusNo,
-                message: responsemsg.userAlreadyExist
-            });
+            return _response.apiWarning(res, responsemsg.userAlreadyExist)
         }
     })
 
@@ -80,19 +69,10 @@ function list(req ,res ){
 
         db.query("SELECT * FROM users", (err, result) => {
         if (!err) {
-            return res.status(200).json({
-                status: responsecode.statusOk,
-                message: result.length+" "+responsemsg.userFound,
-                items: result
-            });
+            return _response.apiSuccess(res, result.length+" "+responsemsg.userFound , result)
 
         } else {
-            return res.status(200).json({
-                status: responsecode.statusNo,
-                message: responsemsg.userListIsEmpty,
-                items: result
-            });
-
+            return _response.apiFailed(res, responsemsg.userListIsEmpty)
         }
     });
 
@@ -100,7 +80,6 @@ function list(req ,res ){
 
 
 function update(req ,res ){
-
     var formData = []
 
     if (req.params.id){
@@ -122,17 +101,13 @@ function update(req ,res ){
                 if (req.query.wallet){
                     formData.wallet = req.query.wallet
                 }
-
                 db.query("UPDATE users SET name ='"+formData.name+"',email ='"+formData.email+"',phone ='"+formData.phone+"',salt ='"+formData.salt+"',wallet ='"+formData.wallet+"' WHERE id = '"+req.params.id+"'" , (err , result) =>{
-
                     if (!err){
                         return _response.apiSuccess(res, responsemsg.userUpdateSuccess)
                     }else{
                         return _response.apiFailed(res, err)
                     }
-
                 })
-
 
             } else {
                 return res.send('')
@@ -140,40 +115,23 @@ function update(req ,res ){
         });
 
     }else {
-        return res.status(200).json({
-            status: responsecode.statusNo,
-            message: 'select id'
-        });
+        return  _response.apiWarning(res, 'Please select id.')
 
     }
 }
 
 function details(req ,res ){
-        //const result = bcrypt.compareSync('123', hash);
+    //const result = bcrypt.compareSync('123', hash);
     if (req.params.id){
         db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
             if (!err && result.length > 0) {
-                return res.status(200).json({
-                    status: responsecode.statusOk,
-                    message: result.length+" "+responsemsg.userFound,
-                    items: result
-                });
-
+                return _response.apiSuccess(res, result.length+" "+responsemsg.userFound ,result)
             } else {
-                return res.status(200).json({
-                    status: responsecode.statusNo,
-                    message: responsemsg.userListIsEmpty
-                });
-
+                return _response.apiWarning(res , responsemsg.userListIsEmpty)
             }
         });
-
     }else {
-        return res.status(200).json({
-            status: responsecode.statusNo,
-            message: 'select id'
-        });
-
+        return _response.apiWarning(res , 'Please select id')
     }
 }
 

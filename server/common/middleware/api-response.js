@@ -16,6 +16,14 @@ module.exports = {
             message: msg,
             items: data
         });
+    },
+
+
+    apiWarning: function apiWarning(res, msg){
+        return res.status(200).json({
+            status: responsecode.statusNo,
+            message: msg
+        });
     }
 
 }
