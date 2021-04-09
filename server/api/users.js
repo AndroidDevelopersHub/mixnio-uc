@@ -37,7 +37,7 @@ const schema = Joi.object({
 function add(req, res){
     //
     var name = req.body.name;
-    var email = req.body.email;
+    var email = req.body.email.toLowerCase();
     var phone = req.body.phone;
     var salt =  bcrypt.hashSync(req.body.salt.toString(),  bcrypt.genSaltSync(10));
 
@@ -109,7 +109,7 @@ function update(req ,res ){
                 })
 
             } else {
-                return res.send('')
+                return _response.apiFailed(res, err)
             }
         });
 

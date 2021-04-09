@@ -7,6 +7,9 @@ router.get('/', (req,res)=>{
 })
 
 require('./users')(router)
+require('./transaction')(router)
+require('./redeem')(router)
+require('./package')(router)
 
 module.exports = router;
 
