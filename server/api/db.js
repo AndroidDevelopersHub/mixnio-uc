@@ -1,6 +1,5 @@
 const mysql = require("mysql");
 
-
 // Dev
 /*const connection = mysql.createConnection({
     host: "localhost",
@@ -13,7 +12,7 @@ const mysql = require("mysql");
 const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "123456",
+    password: "123456", // "" , "root"
     database: "mixcweng_api",
     port: 8889
 });
@@ -21,20 +20,7 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) throw err;
-
     console.log("Connected!");
-
-    // Keep Server Alive to avoid auto shut down
-    // https://stackoverflow.com/questions/20210522/nodejs-mysql-error-connection-lost-the-server-closed-the-connection
-
-
-    // on server stuck send signal to server
-/*    setInterval(function () {
-        connection.query("SELECT 1");
-        // console.log("set Interval running!");
-    }, 5000);*/
-
-
 });
 
 module.exports = connection;
