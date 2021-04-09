@@ -5,6 +5,7 @@ let jwt = require("jsonwebtoken");
 const config = require("../../middleware/config.json"); // refresh
 let tokenChecker = require("../../middleware/tockenchecker");
 const tokenList = {};
+const _response = require('../common/middleware/api-response')
 const responsemsg = require('../common/middleware/response-msg')
 const responsecode = require('../common/middleware/response-code')
 const response = require('../common/middleware/api-response')
@@ -75,7 +76,6 @@ function add(req, res){
 }
 
 
-
 function list(req ,res ){
 
         db.query("SELECT * FROM users", (err, result) => {
@@ -101,13 +101,38 @@ function list(req ,res ){
 
 function update(req ,res ){
 
-    var userData = []
+    var formData = []
 
     if (req.params.id){
         db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
             if (!err && result.length > 0) {
 
-                return res.send('')
+                formData = result[0]
+                if (req.query.phone){
+                    formData.phone = req.query.phone
+                }
+                if (req.query.name){
+                    formData.name = req.query.name
+                }
+                if (req.query.email){
+                    formData.email = req.query.email                }
+                if (req.query.salt){
+                    formData.salt = req.query.salt
+                }
+                if (req.query.wallet){
+                    formData.wallet = req.query.wallet
+                }
+
+                db.query("UPDATE users SET name ='"+formData.name+"',email ='"+formData.email+"',phone ='"+formData.phone+"',salt ='"+formData.salt+"',wallet ='"+formData.wallet+"' WHERE id = '"+req.params.id+"'" , (err , result) =>{
+
+                    if (!err){
+                        return _response.apiSuccess(res, responsemsg.userUpdateSuccess)
+                    }else{
+                        return _response.apiFailed(res, err)
+                    }
+
+                })
+
 
             } else {
                 return res.send('')
