@@ -65,8 +65,7 @@ function add(req, res){
         }else {
             return res.status(200).json({
                 status: responsecode.statusNo,
-                message: responsemsg.userAlreadyExist,
-                items: result
+                message: responsemsg.userAlreadyExist
             });
         }
     })
@@ -83,7 +82,7 @@ function list(req ,res ){
         if (!err) {
             return res.status(200).json({
                 status: responsecode.statusOk,
-                message: responsemsg.userFound,
+                message: result.length+" "+responsemsg.userFound,
                 items: result
             });
 
@@ -101,12 +100,37 @@ function list(req ,res ){
 
 
 function update(req ,res ){
+
     return  res.json('single user update');
 }
 
 function details(req ,res ){
-    const result = bcrypt.compareSync('123', hash);
-    return  res.json('single user details');
+        //const result = bcrypt.compareSync('123', hash);
+    if (req.params.id){
+        db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
+            if (!err && result.length > 0) {
+                return res.status(200).json({
+                    status: responsecode.statusOk,
+                    message: result.length+" "+responsemsg.userFound,
+                    items: result
+                });
+
+            } else {
+                return res.status(200).json({
+                    status: responsecode.statusNo,
+                    message: responsemsg.userListIsEmpty
+                });
+
+            }
+        });
+
+    }else {
+        return res.status(200).json({
+            status: responsecode.statusNo,
+            message: 'select id'
+        });
+
+    }
 }
 
 function _delete(req ,res){
