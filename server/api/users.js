@@ -107,8 +107,11 @@ function update(req ,res ){
         db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
             if (!err && result.length > 0) {
 
+                return res.send('')
 
-            } else {}
+            } else {
+                return res.send('')
+            }
         });
 
     }else {
