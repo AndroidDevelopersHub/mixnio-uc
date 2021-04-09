@@ -38,7 +38,7 @@ function add(req, res){
     var email = req.body.email;
     var phone = req.body.phone;
     var salt =  bcrypt.hashSync(req.body.salt.toString(),  bcrypt.genSaltSync(10));
-    var token = req.body.token;
+
 
     const { error } = schema.validate(req.body);
     if (error) return res.send(error.details[0].message);
@@ -46,7 +46,7 @@ function add(req, res){
     db.query("SELECT * FROM `users` WHERE email = '"+email+"' OR phone = '"+phone+"'", (err, result) =>{
         if (!result.length){
             console.log('User not exist')
-            db.query("INSERT INTO users (name,email,phone,salt,token) VALUES ('"+name+"','"+email+"','"+phone+"','"+salt+"','"+token+"')", (err, result) => {
+            db.query("INSERT INTO users (name,email,phone,salt) VALUES ('"+name+"','"+email+"','"+phone+"','"+salt+"')", (err, result) => {
                 if (!err) {
                     return res.status(200).json({
                         status: responsecode.statusOk,
@@ -101,7 +101,23 @@ function list(req ,res ){
 
 function update(req ,res ){
 
-    return  res.json('single user update');
+    var userData = []
+
+    if (req.params.id){
+        db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
+            if (!err && result.length > 0) {
+
+
+            } else {}
+        });
+
+    }else {
+        return res.status(200).json({
+            status: responsecode.statusNo,
+            message: 'select id'
+        });
+
+    }
 }
 
 function details(req ,res ){
