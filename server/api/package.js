@@ -54,6 +54,17 @@ function add(req, res){
 
 function list(req ,res ){
 
+    var limit = 20;
+    var page = 1;
+    if (req.query.page){
+        page = req.query.page
+    }
+    if (req.query.limit){
+        limit = req.query.limit
+    }
+    var offset = (page - 1) * limit
+
+
     //Search by String
     if (req.query.search_string){
         const schema = Joi.object({
@@ -62,7 +73,7 @@ function list(req ,res ){
         const { error } = schema.validate(req.query);
         if (error) return _response.apiFailed(res ,error.details[0].message)
 
-        db.query("SELECT * FROM package WHERE title && subtitle && type REGEXP '"+req.query.search_string+"'", (err, result) => {
+        db.query("SELECT * FROM package WHERE title && subtitle && type REGEXP '"+req.query.search_string+"' LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err && result.length > 0) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.redeemFound , result)
 
@@ -73,7 +84,7 @@ function list(req ,res ){
 
 
     }else {
-        db.query("SELECT * FROM package", (err, result) => {
+        db.query("SELECT * FROM package LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.packageFound , result)
 
