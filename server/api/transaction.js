@@ -51,14 +51,36 @@ function add(req, res){
 
 function list(req ,res ){
 
-    db.query("SELECT * FROM transaction", (err, result) => {
-        if (!err) {
-            return _response.apiSuccess(res, result.length+" "+responsemsg.transactionFound , result)
+    //Search by String
+    if (req.query.search_string){
+        const schema = Joi.object({
+            search_string: Joi.string().required()
+        });
+        const { error } = schema.validate(req.query);
+        if (error) return _response.apiFailed(res ,error.details[0].message)
 
-        } else {
-            return _response.apiFailed(res, responsemsg.transactionListIsEmpty)
-        }
-    });
+        db.query("SELECT * FROM transaction WHERE type && amount REGEXP '"+req.query.search_string+"'", (err, result) => {
+            if (!err && result.length > 0) {
+                return _response.apiSuccess(res, result.length+" "+responsemsg.redeemFound , result)
+
+            } else {
+                return _response.apiFailed(res, responsemsg.redeemListIsEmpty)
+            }
+        });
+
+
+    }else {
+        db.query("SELECT * FROM transaction", (err, result) => {
+            if (!err) {
+                return _response.apiSuccess(res, result.length+" "+responsemsg.transactionFound , result)
+
+            } else {
+                return _response.apiFailed(res, responsemsg.transactionListIsEmpty)
+            }
+        });
+    }
+
+
 
 }
 

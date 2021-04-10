@@ -67,14 +67,35 @@ function add(req, res){
 
 function list(req ,res ){
 
-        db.query("SELECT * FROM users", (err, result) => {
-        if (!err) {
-            return _response.apiSuccess(res, result.length+" "+responsemsg.userFound , result)
+    //Search by String
+    if (req.query.search_string){
+        const schema = Joi.object({
+            search_string: Joi.string().required()
+        });
+        const { error } = schema.validate(req.query);
+        if (error) return _response.apiFailed(res ,error.details[0].message)
 
-        } else {
-            return _response.apiFailed(res, responsemsg.userListIsEmpty)
-        }
-    });
+        db.query("SELECT * FROM users WHERE name && email && phone REGEXP '"+req.query.search_string+"'", (err, result) => {
+            if (!err && result.length > 0) {
+                return _response.apiSuccess(res, result.length+" "+responsemsg.redeemFound , result)
+
+            } else {
+                return _response.apiFailed(res, responsemsg.redeemListIsEmpty)
+            }
+        });
+
+
+    }else {
+        db.query("SELECT * FROM users", (err, result) => {
+            if (!err) {
+                return _response.apiSuccess(res, result.length+" "+responsemsg.userFound , result)
+
+            } else {
+                return _response.apiFailed(res, responsemsg.userListIsEmpty)
+            }
+        });
+    }
+
 
 }
 

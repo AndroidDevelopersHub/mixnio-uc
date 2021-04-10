@@ -54,14 +54,36 @@ function add(req, res){
 
 function list(req ,res ){
 
-    db.query("SELECT * FROM package", (err, result) => {
-        if (!err) {
-            return _response.apiSuccess(res, result.length+" "+responsemsg.packageFound , result)
+    //Search by String
+    if (req.query.search_string){
+        const schema = Joi.object({
+            search_string: Joi.string().required()
+        });
+        const { error } = schema.validate(req.query);
+        if (error) return _response.apiFailed(res ,error.details[0].message)
 
-        } else {
-            return _response.apiFailed(res, responsemsg.packageListIsEmpty)
-        }
-    });
+        db.query("SELECT * FROM package WHERE title && subtitle && type REGEXP '"+req.query.search_string+"'", (err, result) => {
+            if (!err && result.length > 0) {
+                return _response.apiSuccess(res, result.length+" "+responsemsg.redeemFound , result)
+
+            } else {
+                return _response.apiFailed(res, responsemsg.redeemListIsEmpty)
+            }
+        });
+
+
+    }else {
+        db.query("SELECT * FROM package", (err, result) => {
+            if (!err) {
+                return _response.apiSuccess(res, result.length+" "+responsemsg.packageFound , result)
+
+            } else {
+                return _response.apiFailed(res, responsemsg.packageListIsEmpty)
+            }
+        });
+    }
+
+
 
 }
 
