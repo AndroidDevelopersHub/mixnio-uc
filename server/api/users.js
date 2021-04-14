@@ -64,10 +64,11 @@ function add(req, res){
 
 }
 
-function list(req ,res ){
+async function list(req ,res ){
 
-    var limit = 20;
+    var limit = 500;
     var page = 1;
+    var totalDocs = 0;
     if (req.query.page){
         page = req.query.page
     }
@@ -77,20 +78,25 @@ function list(req ,res ){
     var offset = (page - 1) * limit
 
 
-    //Search by String
-    if (req.query.search_string){
-        const schema = Joi.object({
-            search_string: Joi.string().required()
-        });
-        const { error } = schema.validate(req.query);
-        if (error) return _response.apiFailed(res ,error.details[0].message)
+    db.query("SELECT COUNT(*) AS total FROM users", (err, result) => {
+        if (!err) {
+            totalDocs = result[0].total
+        } else {
 
-        db.query("SELECT * FROM users WHERE name && email && phone REGEXP '"+req.query.search_string+"'  LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+        }
+    });
+
+
+
+    //Search by String
+    if (req.query.search_string && req.query.search_string !== ''){
+
+        db.query("SELECT * FROM users WHERE CONCAT(name, email,phone) REGEXP '"+req.query.search_string+"'  LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err && result.length > 0) {
-                return _response.apiSuccess(res, result.length+" "+responsemsg.redeemFound , result)
+                return _response.apiSuccess(res, result.length+" "+responsemsg.redeemFound , result,{page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
             } else {
-                return _response.apiFailed(res, responsemsg.redeemListIsEmpty)
+                return _response.apiFailed(res, responsemsg.userListIsEmpty)
             }
         });
 
@@ -98,10 +104,10 @@ function list(req ,res ){
     }else {
         db.query("SELECT * FROM users LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err) {
-                return _response.apiSuccess(res, result.length+" "+responsemsg.userFound , result)
+                return _response.apiSuccess(res, result.length+" "+responsemsg.userFound , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
             } else {
-                return _response.apiFailed(res, responsemsg.userListIsEmpty)
+                return _response.apiFailed(res, responsemsg.userListIsEmpty )
             }
         });
     }

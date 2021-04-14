@@ -2,11 +2,12 @@ var responsecode = require('../middleware/response-code')
 var responsemsg = require('../middleware/response-msg')
 
 module.exports = {
-   apiSuccess: function apiSuccess(res, msg, data){
+   apiSuccess: function apiSuccess(res, msg, data, pagination){
        return res.status(200).json({
            status: responsecode.statusOk,
            message: msg,
-           items: data
+           items: data,
+           pagination: pagination
        });
    },
 
