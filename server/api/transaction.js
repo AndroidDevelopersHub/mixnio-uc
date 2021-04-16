@@ -109,6 +109,10 @@ function update(req ,res ){
                 if (req.query.amount){
                     formData.amount = req.query.amount
                 }
+                if (req.query.status){
+                    formData.status = req.query.status
+                }
+
                 db.query("UPDATE transaction SET type ='"+formData.type+"',status ='"+formData.status+"',  amount ='"+formData.amount+"' WHERE id = '"+req.params.id+"'" , (err , result) =>{
                     if (!err){
                         return _response.apiSuccess(res, responsemsg.transactionUpdateSuccess)
