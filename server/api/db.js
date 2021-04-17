@@ -8,7 +8,7 @@ const mysql = require("mysql");
 //     database: "mixcweng_api"
 // });
 
-Local
+
 const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
