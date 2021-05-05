@@ -7,6 +7,7 @@ let tokenChecker = require("../../middleware/tockenchecker");
 const tokenList = {};
 const _response = require('../common/middleware/api-response')
 const responsemsg = require('../common/middleware/response-msg')
+const commonStrings = require('../common/middleware/common-strings')
 const responsecode = require('../common/middleware/response-code')
 const response = require('../common/middleware/api-response')
 const Joi = require('@hapi/joi')
@@ -17,6 +18,7 @@ const commonServe = require('../common/services/commonServices')
 module.exports = function (router) {
     router.get('/users', list);
     router.post('/users', add);
+    router.post('/google_login', googleLogin);
     router.put('/users/:id', update);
     router.get('/users/:id', details);
     router.delete('/users/:id', _delete);
@@ -32,6 +34,18 @@ const schema = Joi.object({
     salt: Joi.string().required(),
     //token: Joi.string().required()
 });
+
+
+const googleSchema = Joi.object({
+    name: Joi.string().min(6).required(),
+    email: Joi.string().email().required(),
+    token: Joi.string().min(21).required()
+});
+
+
+let verified = "verified"
+let pending = "pending"
+
 
 function add(req, res){
     //
@@ -57,6 +71,76 @@ function add(req, res){
 
         }else {
             return _response.apiWarning(res, responsemsg.userAlreadyExist)
+        }
+    })
+
+
+
+}
+
+
+
+
+
+function googleLogin(req, res){
+    //
+    let name = req.body.name;
+    let email = req.body.email.toLowerCase();
+    let authToken = req.body.token;
+
+    const user = {
+        email: email,
+        name: name,
+        token: authToken,
+    };
+
+    const { error } = googleSchema.validate(req.body);
+
+    if (error) return _response.apiFailed(res ,error.details[0].message)
+
+    // Generate AccessToken
+    const accessToken = jwt.sign(user, config.secret, {
+        expiresIn: config.tokenLife,
+    });
+
+    // Generate RefreshToken
+    const refreshToken = jwt.sign(user, config.refreshTokenSecret, {
+        expiresIn: config.refreshTokenLife,
+    });
+
+
+    db.query("SELECT * FROM `users` WHERE email = '"+email+"'", (err, result) =>{
+        if (!result.length){
+            console.log('User not exist')
+            db.query("INSERT INTO users (name,email,isVerified,ac_status) VALUES ('"+name+"','"+email+"','"+commonStrings.verified+"','"+commonStrings.active+"')", (err, result) => {
+                if (!err) {
+
+                    const response = {
+                        result: result,
+                        accessToken: accessToken,
+                        refreshToken: refreshToken,
+                    };
+                    tokenList[refreshToken] = response;
+
+                    return _response.apiSuccess(res, responsemsg.userSaveSuccess , response)
+                } else {
+                    return _response.apiFailed(res, err , result)
+                }
+            });
+
+        }else {
+
+            const response = {
+                result: result[0],
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            };
+            tokenList[refreshToken] = response;
+
+            return _response.apiSuccess(res, responsemsg.userAlreadyExist , response)
+
+
+            // return _response.apiWarning(res, responsemsg.userAlreadyExist)
         }
     })
 
@@ -276,6 +360,7 @@ function signup(req ,res ){
 }
 
 
+
 //Get New Access Token When Previous AccessToken is not validate any more
 router.post('/get_accessToken', (req,res) => {
     // refresh the damn token
@@ -303,21 +388,3 @@ router.post('/get_accessToken', (req,res) => {
 
 
 
-//Get All Users
-// router.get("/users", (req, res) => {
-//     db.query("SELECT * FROM user_info", (err, rows, fields) => {
-//         if (!err) {
-//             res.send({
-//                 result: true,
-//                 msg: "User Details Found",
-//                 data: rows,
-//             });
-//         } else {
-//             res.send({
-//                 result: false,
-//                 msg: "Sorry something went wrong",
-//                 error: err,
-//             });
-//         }
-//     });
-// });
