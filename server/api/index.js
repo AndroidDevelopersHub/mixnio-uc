@@ -10,6 +10,7 @@ require('./users')(router)
 require('./transaction')(router)
 require('./redeem')(router)
 require('./package')(router)
+require('./game_pass')(router)
 
 module.exports = router;
 
