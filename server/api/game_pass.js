@@ -90,8 +90,8 @@ async function joinList(req ,res ){
         });
 
 
-    }else {
-        db.query("SELECT * FROM game_pass_entry LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+    } else {
+        db.query("SELECT * FROM game_pass_entry WHERE game_pass_id='"+req.params.game_pass_id+"' LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.found , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
