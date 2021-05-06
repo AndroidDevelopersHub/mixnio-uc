@@ -22,7 +22,7 @@ module.exports = function (router) {
     router.delete('/game_pass/:id', _delete);
 
     router.post('/game_pass/join', join);
-    router.get('/game_pass/join_list', joinList);
+    router.get('/game_pass/join', joinList);
 
 }
 
