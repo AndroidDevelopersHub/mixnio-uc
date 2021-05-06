@@ -21,8 +21,8 @@ module.exports = function (router) {
     router.get('/game_pass/:id', details);
     router.delete('/game_pass/:id', _delete);
 
-    router.post('/game_pass/join', join);
-    router.get('/game_pass/join', joinList);
+    router.post('/game_pass_entry', join);
+    router.get('/game_pass_entry', joinList);
 
 }
 
@@ -90,8 +90,8 @@ async function joinList(req ,res ){
         });
 
 
-    } else {
-        db.query("SELECT * FROM game_pass_entry LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+    } else if (req.query.game_pass_id && req.query.game_pass_id !== '') {
+        db.query("SELECT * FROM `game_pass_entry` WHERE game_pass_id = '"+req.query.game_pass_id+"' LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.found , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
