@@ -29,7 +29,6 @@ const schema = Joi.object({
     uid: Joi.string().required(),
 });
 
-
 function add(req, res){
     //
     var type = req.body.type;

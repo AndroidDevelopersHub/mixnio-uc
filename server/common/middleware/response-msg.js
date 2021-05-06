@@ -63,4 +63,17 @@ module.exports = {
     packageWalletUpdateSuccess: 'package wallet has update successfully.',
 
 
+    //common
+    saveSuccess: ' has been added successfully.',
+    alreadyExist: ' already exist',
+    doesntExists: ' doesnt exist',
+    updateSuccess: ' has updated successfully',
+    statusChangeSuccess: ' status has changed successfully.',
+    deleteSuccess: ' deleted successfully.',
+    notAvailable: ' not available.',
+    listIsEmpty: 'Not  Found.',
+    found: 'Found.',
+    walletUpdateSuccess: 'wallet has update successfully.',
+
+
 }
