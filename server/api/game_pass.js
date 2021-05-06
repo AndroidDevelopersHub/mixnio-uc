@@ -96,7 +96,7 @@ async function joinList(req ,res ){
                 return _response.apiSuccess(res, result.length+" "+responsemsg.found , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
             } else {
-                return _response.apiFailed(res, responsemsg.listIsEmpty )
+                return _response.apiFailed(res,err )
             }
         });
     }
