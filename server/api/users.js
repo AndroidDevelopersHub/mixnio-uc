@@ -61,7 +61,7 @@ function add(req, res){
     db.query("SELECT * FROM `users` WHERE email = '"+email+"' OR phone = '"+phone+"'", (err, result) =>{
         if (!result.length){
             console.log('User not exist')
-            db.query("INSERT INTO users (name,email,phone,salt) VALUES ('"+name+"','"+email+"','"+phone+"','"+salt+"')", (err, result) => {
+            db.query("INSERT INTO users SET ?", req.body , (err, result) => {
                 if (!err) {
                     return _response.apiSuccess(res, responsemsg.userSaveSuccess , result)
                 } else {
@@ -112,9 +112,8 @@ function googleLogin(req, res){
     db.query("SELECT * FROM `users` WHERE email = '"+email+"'", (err, result) =>{
         if (!result.length){
             console.log('User not exist')
-            db.query("INSERT INTO users (name,email,isVerified,ac_status) VALUES ('"+name+"','"+email+"','"+commonStrings.verified+"','"+commonStrings.active+"')", (err, result) => {
+            db.query("INSERT INTO users SET ?", req.body , (err, result) => {
                 if (!err) {
-
                     const response = {
                         result: result,
                         accessToken: accessToken,
