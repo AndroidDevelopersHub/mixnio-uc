@@ -100,8 +100,6 @@ function googleLogin(req, res){
     let email = req.body.email.toLowerCase();
     let authToken = req.body.token;
 
-    delete req.body.token;
-
     const user = {
         email: email,
         name: name,
@@ -126,6 +124,7 @@ function googleLogin(req, res){
     db.query("SELECT * FROM `users` WHERE email = '"+email+"'", (err, result) =>{
         if (!result.length){
             console.log('User not exist')
+            delete req.body.token;
             db.query("INSERT INTO users SET ?", req.body , (err, result) => {
                 if (!err) {
                     const response = {
