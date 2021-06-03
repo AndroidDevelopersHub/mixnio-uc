@@ -100,6 +100,8 @@ function googleLogin(req, res){
     let email = req.body.email.toLowerCase();
     let authToken = req.body.token;
 
+    delete req.body.token;
+
     const user = {
         email: email,
         name: name,
