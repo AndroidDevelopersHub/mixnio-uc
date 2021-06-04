@@ -55,6 +55,8 @@ function join(req, res){
 
 async function joinList(req ,res ){
 
+    // uid
+
     var limit = 500;
     var page = 1;
     var totalDocs = 0;
@@ -99,8 +101,29 @@ async function joinList(req ,res ){
                 return _response.apiFailed(res, responsemsg.listIsEmpty )
             }
         });
-    }else {
-        db.query("SELECT * FROM `game_pass_entry` LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+    } else if (req.query.uid && req.query.uid !== '' && req.query.uid !== null){
+        db.query("SELECT * FROM `game_pass_entry` INNER JOIN `users` ON game_pass_entry.uid = users.id WHERE game_pass_entry.uid = "+req.query.uid+" AND game_pass_entry.winner = '1' LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+            if (!err) {
+                return _response.apiSuccess(res, result.length+" "+responsemsg.found , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
+
+            } else {
+                return _response.apiFailed(res, responsemsg.listIsEmpty )
+            }
+        });
+    }
+    else if (req.query.winner){
+        db.query("SELECT * FROM `game_pass_entry` INNER JOIN `users` ON game_pass_entry.uid = users.id WHERE game_pass_entry.winner = '1' LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+            if (!err) {
+                return _response.apiSuccess(res, result.length+" "+responsemsg.found , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
+
+            } else {
+                return _response.apiFailed(res, responsemsg.listIsEmpty )
+            }
+        });
+    }
+
+    else {
+        db.query("SELECT * FROM `game_pass_entry` INNER JOIN `users` ON game_pass_entry.uid = users.id WHERE game_pass_entry.winner = '1' LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.found , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
