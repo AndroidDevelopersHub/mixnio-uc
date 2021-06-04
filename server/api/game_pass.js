@@ -101,8 +101,10 @@ async function joinList(req ,res ){
                 return _response.apiFailed(res, responsemsg.listIsEmpty )
             }
         });
-    } else if (req.query.uid && req.query.uid !== '' && req.query.uid !== null){
-        db.query("SELECT * FROM `game_pass_entry` INNER JOIN `users` ON game_pass_entry.uid = users.id WHERE game_pass_entry.uid = "+req.query.uid+" AND game_pass_entry.winner = '1' LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+    }
+    //SELECT * FROM `game_pass_entry` AS g INNER JOIN `users` AS u ON g.uid = u.id WHERE g.uid = '1' AND winner = '1'
+    else if (req.query.uid && req.query.uid !== '' && req.query.uid !== null){
+        db.query("SELECT * FROM `game_pass_entry` AS g INNER JOIN `users` AS u ON g.uid = u.id WHERE g.uid = '"+req.query.uid+"' AND g.winner = '1' LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.found , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
