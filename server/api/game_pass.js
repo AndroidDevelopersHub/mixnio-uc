@@ -12,6 +12,7 @@ const response = require('../common/middleware/api-response')
 const Joi = require('@hapi/joi')
 const bcrypt = require('bcrypt');
 const commonServe = require('../common/services/commonServices')
+const dailyBonusUtil = require('../common/utils/dailyBonusUtil')
 
 
 module.exports = function (router) {
@@ -22,6 +23,7 @@ module.exports = function (router) {
     router.delete('/game_pass/:id', _delete);
 
     router.post('/game_pass_entry', join);
+    router.put('/game_pass_entry', setWinner);
     router.get('/game_pass_entry', joinList);
 
 }
@@ -43,6 +45,23 @@ function join(req, res){
 
     console.log('User not exist')
     db.query("INSERT INTO game_pass_entry SET ?", req.body , (err, result) => {
+        if (!err) {
+            return _response.apiSuccess(res, responsemsg.saveSuccess , result)
+        } else {
+            return _response.apiFailed(res, err , result)
+        }
+    });
+}
+
+
+function setWinner(req, res){
+    //
+    // const { error } = schema.validate(req.body);
+    // if (error) return _response.apiFailed(res ,error.details[0].message)
+
+    //game_pass_id
+    //uid
+    db.query("UPDATE  game_pass_entry WHERE game_pass_id = '"+req.query.game_pass_id+"' AND  uid = '"+req.query.uid+"' SET ?", req.body , (err, result) => {
         if (!err) {
             return _response.apiSuccess(res, responsemsg.saveSuccess , result)
         } else {
