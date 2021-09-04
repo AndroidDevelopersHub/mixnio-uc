@@ -16,106 +16,55 @@ const dailyBonusUtil = require('../common/utils/dailyBonusUtil')
 
 
 module.exports = function (router) {
-    router.get('/daily_bonus', list);
+   /* router.get('/daily_bonus', list);
     router.post('/daily_bonus', add);
     router.put('/daily_bonus/:id', update);
     router.get('/daily_bonus/:id', details);
-    router.delete('/daily_bonus/:id', _delete);
+    router.delete('/daily_bonus/:id', _delete);*/
+    router.post('/daily_quiz', getQuestion);
 
-    router.post('/lucky_card', getLuckyCard);
 }
 
 
 const schema = Joi.object({
-    uid: Joi.number().required(),
-    point: Joi.number().required(),
-    earn_from: Joi.number().required(),
-
+    uid: Joi.string().min(6).required(),
+    title: Joi.string().email().required(),
+    point: Joi.string().min(11).required(),
+    //token: Joi.string().required()
 });
 
 
-async function getLuckyCard(req,res){
-    const { error } = schema.validate(req.body);
-    if (error) return _response.apiFailed(res ,error.details[0].message)
-
-    db.query("SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" AND earn_from = "+req.body.earn_from+" ORDER BY createdAt LIMIT 1" , (err00, result) => {
-        if (!err00) {
-
-            if (result.length > 0){
-                let queryX = "SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" && earn_from = "+req.body.earn_from+" && createdAt > (NOW() - INTERVAL 10 MINUTE";
-                if (req.query.earn_from === 4){
-                    queryX = "SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" && earn_from = "+req.body.earn_from+" && createdAt > (NOW() - INTERVAL 15 MINUTE"
-                }
-                db.query(queryX, (err0, result1) => {
-                    if (!err0) {
-
-                        console.log(result1)
-                        if (result1.length < 1){
-
-                            //update
-                            db.query("UPDATE `daily_bonus` SET createdAt = now() WHERE uid ="+req.body.uid+" AND earn_from = "+req.body.earn_from+" " , (err, result2) => {
-                                if (!err){
-                                    updateUserCoin(req,res)
-                                }else {
-                                    return _response.apiFailed(res, "Something went wrong!",err)
-                                }
-                            })
-
-                        }else {
-                            return _response.apiFailed(res, "Please wait few minutes")
-                        }
-
-
-                    }else {return _response.apiFailed(res, err)}})
-
+async function getQuestion(req,res){
+    let query = "SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" AND earn_from = 4 AND createdAt > (NOW() - INTERVAL 15 MINUTE)";
+    db.query(query ,  (err, result1) =>{
+        if (!err){
+            if (result1.length < 1){
+                //update
+                db.query("UPDATE `daily_bonus` SET createdAt = now() WHERE uid ="+req.body.uid+" AND earn_from = "+4+" " , (err, result2) => {
+                    if (!err){
+                        db.query("SELECT * FROM `quiz_question_list` ORDER BY RAND() LIMIT 1" , (err, result2) => {
+                            if (!err){
+                                return _response.apiSuccess(res, responsemsg.found, result2)
+                            }})
+                    }else {
+                        return _response.apiFailed(res, "Something went wrong!",err)
+                    }
+                })
             }else {
-                // insert
+                return _response.apiFailed(res, "Please wait few minutes")
             }
-
-
-        } else {
-            return _response.apiFailed(res, err , result)
+        }else {
+            return _response.apiFailed(res, err)
         }
-    });
-}
-
-
-async function updateUserCoin(req,res){
-
-    db.query("SELECT * FROM `users` WHERE id ="+req.body.uid+"" , (err, result) => {
-
-       if (!err){
-           if (result.length> 0){
-               console.log(result[0])
-
-               let cWallet = parseInt(result[0].wallet);
-               let final = cWallet + parseInt(req.body.point)
-
-               db.query("UPDATE `users` SET wallet = "+final+" WHERE id ="+req.body.uid+"" , (err, result2) => {
-                   if (!err){
-                       return _response.apiSuccess(res, req.body.point+ " Points Successfully added to your account.")
-                   }else {
-                       return _response.apiFailed(res, "Something went wrong!")
-                   }
-               })
-
-
-
-           }else {
-               return _response.apiWarning(res, err)
-           }
-       }else {
-           return _response.apiWarning(res, err)
-       }
     })
 
 }
 
 
 function add(req, res){
-     //
+    //
     // const { error } = schema.validate(req.body);
-   // if (error) return _response.apiFailed(res ,error.details[0].message)
+    // if (error) return _response.apiFailed(res ,error.details[0].message)
 
     db.query("INSERT INTO daily_bonus SET ?", req.body , (err, result) => {
         if (!err) {

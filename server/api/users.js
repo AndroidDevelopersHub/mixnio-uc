@@ -20,10 +20,14 @@ module.exports = function (router) {
     router.get('/users', list);
     router.post('/users', add);
     router.post('/google_login', googleLogin);
+    router.post('/users/login', login);
+    router.post('/users/registration', registration);
+
     router.put('/users/:id', update);
     router.get('/users/:id', details);
     router.delete('/users/:id', _delete);
     router.post('/users-add', signup);
+    router.patch('/users/wallet/:id' , walletUpdate);
     router.patch('/users/wallet/:id' , walletUpdate);
 }
 
@@ -46,6 +50,65 @@ const googleSchema = Joi.object({
 
 let verified = "verified"
 let pending = "pending"
+
+
+
+async function login(req,res){
+    let responseData = {}
+    let email = req.body.email.toLowerCase();
+    let password = req.body.password;
+
+    await db.query("SELECT * FROM `users` WHERE  email =  '" + email + "' ", (err, result1) => {
+        if (!err) {
+            if (result1.length > 0) {
+                bcrypt.compare(password, result1[0].salt).then(function (result) {
+                    // result == true
+                    console.log(result)
+                    if (result === true) {
+                        let token = jwt.sign({user: result[0]}, config.secret, {
+                            expiresIn: 100186400 // expires in 24 hours
+                        });
+                        responseData.result = result1[0]
+                        responseData.token = token
+                        return _response.apiSuccess(res, responsemsg.found, responseData)
+                    } else {
+                        return _response.apiFailed(res, err, {})
+                    }
+                });
+            } else {
+                return _response.apiFailed(res, err, {})
+            }
+        } else {
+            return _response.apiFailed(res, err, {})
+        }
+    })
+
+
+}
+
+async function registration(req,res){
+
+    let responseData = {}
+
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hash = bcrypt.hashSync(req.body.password, salt);
+    req.body.salt = hash
+    req.body.hash = salt
+    delete req.body.password
+
+
+    let isExist = await db.awaitQuery("SELECT 1 FROM  `users` WHERE email ='" + req.body.email.toLowerCase() + "' OR phone ='" + req.body.phone + "' ");
+
+    if (isExist.length < 1) {
+            let result = await db.awaitQuery("INSERT INTO `users` SET ?", req.body);
+            return _response.apiSuccess(res, "Registration Successfully!", result)
+
+    } else {
+        return _response.apiWarning(res, "User already exist!")
+    }
+
+}
 
 
 function admin_login(req, res){
@@ -348,17 +411,13 @@ function walletUpdate(req , res){
 
 function signup(req ,res ){
     const postData = req.body;
-    const user = {
-        email: postData.email,
-        name: postData.name,
-        token: postData.token,
-    };
+
 
     // do the database authentication here, with user name and password combination.
     const accessToken = jwt.sign(user, config.secret, {
         expiresIn: config.tokenLife,
     });
-    const refreshToken = jwt.sign(user, config.refreshTokenSecret, {
+    const refreshToken = jwt.sign(req.body, config.refreshTokenSecret, {
         expiresIn: config.refreshTokenLife,
     });
     const response = {

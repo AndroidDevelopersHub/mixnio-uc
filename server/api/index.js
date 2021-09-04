@@ -15,6 +15,9 @@ require('./news')(router)
 require('./payouts')(router)
 require('./payout_history')(router)
 require('./slider')(router)
+require('./daily_bonus')(router)
+require('./daily-quiz')(router)
+
 
 module.exports = router;
 
