@@ -42,9 +42,9 @@ async function getLuckyCard(req,res){
         if (!err00) {
 
             if (result.length > 0){
-                let queryX = "SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" && earn_from = "+req.body.earn_from+" && createdAt > (NOW() - INTERVAL 10 MINUTE";
+                let queryX = "SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" && earn_from = "+req.body.earn_from+" && createdAt > (NOW() - INTERVAL 10 MINUTE)";
                 if (req.query.earn_from === 4){
-                    queryX = "SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" && earn_from = "+req.body.earn_from+" && createdAt > (NOW() - INTERVAL 15 MINUTE"
+                    queryX = "SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" && earn_from = "+req.body.earn_from+" && createdAt > (NOW() - INTERVAL 15 MINUTE)"
                 }
                 db.query(queryX, (err0, result1) => {
                     if (!err0) {
@@ -66,10 +66,18 @@ async function getLuckyCard(req,res){
                         }
 
 
-                    }else {return _response.apiFailed(res, err)}})
+                    }else {return _response.apiFailed(res, err0)}})
 
             }else {
                 // insert
+                //update
+                db.query("INSERT INTO `daily_bonus` SET createdAt = now() , uid ="+req.body.uid+" , earn_from = "+req.body.earn_from+" " , (err, result2) => {
+                    if (!err){
+                        updateUserCoin(req,res)
+                    }else {
+                        return _response.apiFailed(res, "Something went wrong!",err)
+                    }
+                })
             }
 
 
