@@ -44,6 +44,8 @@ async function getQuestion(req,res){
                     if (!err){
                         db.query("SELECT * FROM `quiz_question_list` ORDER BY RAND() LIMIT 1" , (err, result2) => {
                             if (!err){
+
+
                                 return _response.apiSuccess(res, responsemsg.found, result2)
                             }})
                     }else {

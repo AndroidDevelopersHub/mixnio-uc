@@ -28,7 +28,7 @@ module.exports = function (router) {
 
 const schema = Joi.object({
     uid: Joi.number().required(),
-    point: Joi.number().required(),
+   /* point: Joi.number().required(),*/
     earn_from: Joi.number().required(),
 
 });
@@ -37,6 +37,17 @@ const schema = Joi.object({
 async function getLuckyCard(req,res){
     const { error } = schema.validate(req.body);
     if (error) return _response.apiFailed(res ,error.details[0].message)
+
+    if (req.body.earn_from){
+        let getRandomPoint = await db.awaitQuery("SELECT * FROM `random_point` ORDER BY RAND() LIMIT 1");
+        if (getRandomPoint.length > 0){
+            req.body.point = parseFloat(getRandomPoint[0].value)
+        }else {
+            req.body.point = 0
+        }
+    }
+
+    console.log(req.body.point)
 
     db.query("SELECT * FROM `daily_bonus` WHERE uid ="+req.body.uid+" AND earn_from = "+req.body.earn_from+" ORDER BY createdAt LIMIT 1" , (err00, result) => {
         if (!err00) {
@@ -70,7 +81,6 @@ async function getLuckyCard(req,res){
 
             }else {
                 // insert
-                //update
                 db.query("INSERT INTO `daily_bonus` SET createdAt = now() , uid ="+req.body.uid+" , earn_from = "+req.body.earn_from+" " , (err, result2) => {
                     if (!err){
                         updateUserCoin(req,res)
@@ -90,6 +100,8 @@ async function getLuckyCard(req,res){
 
 async function updateUserCoin(req,res){
 
+    await db.awaitQuery("INSERT INTO `earning_history` SET ?" , req.body)
+
     db.query("SELECT * FROM `users` WHERE id ="+req.body.uid+"" , (err, result) => {
 
        if (!err){
@@ -101,6 +113,8 @@ async function updateUserCoin(req,res){
 
                db.query("UPDATE `users` SET wallet = "+final+" WHERE id ="+req.body.uid+"" , (err, result2) => {
                    if (!err){
+
+
                        return _response.apiSuccess(res, req.body.point+ " Points Successfully added to your account.")
                    }else {
                        return _response.apiFailed(res, "Something went wrong!")
